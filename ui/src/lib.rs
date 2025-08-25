@@ -5,3 +5,5 @@ pub mod api;
 pub mod model;
 
 pub use animal::Animal;
+
+pub use animal::UiApp;

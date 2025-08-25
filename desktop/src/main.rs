@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use ui::Animal;
+use ui::UiApp;
 
 fn main() {
     launch(App);
@@ -8,9 +8,7 @@ fn main() {
 
 #[component]
 fn App() -> Element {
-    // Build cool things ✌️
-
     rsx! {
-        Animal {}
+        UiApp {}
     }
 }

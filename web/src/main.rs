@@ -1,6 +1,6 @@
 use dioxus::prelude::*;
 
-use ui::Animal;
+use ui::UiApp;
 
 const FAVICON: Asset = asset!("/assets/favicon.ico");
 
@@ -15,6 +15,6 @@ fn App() -> Element {
     rsx! {
         document::Link { rel: "icon", href: FAVICON }
 
-        Animal {}
+        UiApp {}
     }
 }

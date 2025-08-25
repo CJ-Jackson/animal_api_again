@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 .content {
-    @apply mx-auto mt-3;
+    @apply mx-auto mt-3 mb-2;
 
     h1 {
         @apply text-3xl;
