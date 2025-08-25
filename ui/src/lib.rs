@@ -1,4 +1,7 @@
 //! This crate contains all shared UI for the workspace.
 
-mod hero;
-pub use hero::Hero;
+mod animal;
+pub mod api;
+pub mod model;
+
+pub use animal::Animal;
