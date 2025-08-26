@@ -1,5 +1,6 @@
 use crate::api::animal::{add_animal, edit_animal, fetch_all_animals, fetch_animal_by_id};
-use crate::model::animal::AnimalAddUpdateModel;
+use crate::model::animal::{AnimalAddUpdateModel, AnimalModel};
+use dioxus::document::Title;
 use dioxus::prelude::*;
 
 const MAIN_CSS: Asset = asset!("/assets/styling/main.css");
@@ -26,10 +27,22 @@ pub fn UiApp() -> Element {
 #[component]
 pub fn Animal() -> Element {
     let mut animals = use_resource(|| async move { fetch_all_animals().await });
-    let mut species = use_signal(|| "".to_string());
-    let mut description = use_signal(|| "".to_string());
+    let mut animal_input = use_signal(|| AnimalModel::default());
+    let mut animal_value = use_signal(|| AnimalModel::default());
+
+    let submit = move || async move {
+        let animal = animal_input.cloned();
+        add_animal(AnimalAddUpdateModel {
+            species: animal.species,
+            description: animal.description,
+        })
+        .await;
+        animal_value.set(AnimalModel::default());
+        animals.restart();
+    };
 
     rsx! {
+        Title { "Animal" }
         h1 { "Animal" }
         div { class: "animals",
             for animal in animals.cloned().unwrap_or_default().iter() {
@@ -42,24 +55,24 @@ pub fn Animal() -> Element {
                 }
             }
         }
-        div { class: "form",
+        form { class: "form", onsubmit: move |_| async move { submit().await },
             label { class:"form-label", r#for: "species", "Species" }
-            input { class:"form-item", type: "text", placeholder: "Species", name: "species",
-                oninput: move |e| species.set(e.value()) }
+            input { class:"form-item", id: "species", type: "text", placeholder: "Species",
+                name: "species", value: animal_value.cloned().species,
+                oninput: move |e| {
+                    let mut a = animal_input.write();
+                    a.species = e.value();
+                },
+            }
             label { class:"form-label", r#for: "description", "Description" }
-            input { class:"form-item", type: "text", placeholder: "Description", name: "description",
-                oninput: move |e| description.set(e.value()) }
-        }
-        div {
-            button { class: "btn btn-skyblue", onclick: move |_| async move {
-                add_animal(AnimalAddUpdateModel{
-                    species: species.to_string(),
-                    description: description.to_string(),
-                }).await;
-                species.set("".to_string());
-                description.set("".to_string());
-                animals.restart();
-            }, id: "Add", "Add" }
+            input { class:"form-item", id: "description", type: "text", placeholder: "Description",
+                name: "description", value: animal_value.cloned().description,
+                oninput: move |e| {
+                    let mut a = animal_input.write();
+                    a.description = e.value();
+                },
+            }
+            button { class: "btn btn-skyblue", type: "submit", "Add"}
         }
     }
 }
@@ -69,33 +82,48 @@ pub fn EditAnimal(id: i64) -> Element {
     let nav = navigator();
 
     let animal = use_resource(move || async move { fetch_animal_by_id(id).await });
-    let mut species = use_signal(|| "".to_string());
-    let mut description = use_signal(|| "".to_string());
+    let mut animal_input = use_signal(|| AnimalModel::default());
+    {
+        let mut a = animal_input.write();
+        a.species = animal.cloned().unwrap_or_default().species;
+        a.description = animal.cloned().unwrap_or_default().description;
+    }
+
+    let submit = move || async move {
+        let animal = animal_input.cloned();
+        edit_animal(
+            id,
+            AnimalAddUpdateModel {
+                species: animal.species,
+                description: animal.description,
+            },
+        )
+        .await;
+        nav.push(Route::Animal {});
+    };
 
     rsx! {
+        Title { "Edit Animal" }
         h1 { "Edit Animal" }
-        div { class: "form",
+        form { class: "form", onsubmit: move |_| async move { submit().await },
             label { class:"form-label", r#for: "species", "Species" }
             input { class:"form-item", type: "text", placeholder: "Species",
-                name: "species", value: animal.cloned().unwrap_or_default().species,
-                oninput: move |e| species.set(e.value()) }
+                name: "species", id: "species", value: animal.cloned().unwrap_or_default().species,
+                oninput: move |e| {
+                    let mut a = animal_input.write();
+                    a.species = e.value();
+                }
+            }
             label { class:"form-label", r#for: "description", "Description" }
             input { class:"form-item", type: "text", placeholder: "Description",
-                name: "description", value: animal.cloned().unwrap_or_default().description,
-                oninput: move |e| description.set(e.value()) }
+                name: "description", id: "description", value: animal.cloned().unwrap_or_default().description,
+                oninput: move |e| {
+                    let mut a = animal_input.write();
+                    a.description = e.value();
+                }
+            },
+            button { class: "btn btn-skyblue", type: "submit", "Edit"}
         }
-        div {
-            button { class: "btn btn-skyblue", onclick: move |_| async move {
-                let animal = animal.cloned().unwrap_or_default();
-                edit_animal(id, AnimalAddUpdateModel{
-                    species: species.to_string().is_empty().then(|| animal.species).unwrap_or(species.to_string()),
-                    description: description.to_string().is_empty().then(|| animal.description).unwrap_or(description.to_string()),
-                }).await;
-                species.set("".to_string());
-                description.set("".to_string());
-                nav.push(Route::Animal {});
-            }, id: "Edit", "Edit" }
-        }
-        Link { class: "animal-id btn btn-skyblue", to: Route::Animal { }, "Back to Animal" }
+        Link { class: "btn btn-skyblue inline-block", to: Route::Animal { }, "Back to Animal" }
     }
 }
