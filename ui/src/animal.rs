@@ -69,8 +69,8 @@ pub fn EditAnimal(id: i64) -> Element {
     let nav = navigator();
 
     let animal = use_resource(move || async move { fetch_animal_by_id(id).await });
-    let mut species = use_signal(|| animal.cloned().unwrap_or_default().species);
-    let mut description = use_signal(|| animal.cloned().unwrap_or_default().description);
+    let mut species = use_signal(|| "".to_string());
+    let mut description = use_signal(|| "".to_string());
 
     rsx! {
         h1 { "Edit Animal" }
