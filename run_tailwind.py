@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import os
 import subprocess
-from pathlib import Path
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
