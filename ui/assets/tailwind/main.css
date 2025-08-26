@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "./tailwindcss";
 
 .content {
     @apply mx-auto mt-3 mb-2;

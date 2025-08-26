@@ -10,5 +10,5 @@ map_css: dict = {
 }
 
 for key, value in map_css.items():
-    subprocess.run(['npx', '@tailwindcss/cli', '-i', key, '-o', value])
+    subprocess.run(['tailwindcss', '-i', key, '-o', value])
     print(f"{key} -> {value}")
