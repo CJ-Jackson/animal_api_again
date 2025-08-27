@@ -1,6 +1,6 @@
 use crate::api::animal::{add_animal, edit_animal, fetch_all_animals, fetch_animal_by_id};
 use crate::ext::ResetSignal;
-use crate::model::animal::{AnimalAddUpdateModel, AnimalModel, AnimalModelSignal};
+use crate::model::animal::{AnimalModel, AnimalModelSignal};
 use dioxus::document::Title;
 use dioxus::prelude::*;
 
