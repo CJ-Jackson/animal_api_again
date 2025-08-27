@@ -22,6 +22,8 @@ pub enum FetchAnimalByIdResponse {
 pub enum AddAnimalResponse {
     #[oai(status = 201)]
     Created,
+    #[oai(status = 422)]
+    UnprocessableEntity,
     #[oai(status = 400)]
     BadRequest,
 }
@@ -30,6 +32,8 @@ pub enum AddAnimalResponse {
 pub enum UpdateAnimalResponse {
     #[oai(status = 200)]
     Ok,
+    #[oai(status = 422)]
+    UnprocessableEntity,
     #[oai(status = 404)]
     NotFound,
 }

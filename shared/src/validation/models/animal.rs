@@ -25,15 +25,12 @@ pub struct AnimalValidated {
 }
 
 impl AnimalValidated {
-    pub fn parse(
-        species_ori: String,
-        description_org: String,
-    ) -> Result<Self, AnimalValidationError> {
+    pub fn parse(species: String, description: String) -> Result<Self, AnimalValidationError> {
         let mut flag = false;
 
         use error_flag as ef;
-        let species = ef(&mut flag, Species::parse(species_ori.clone()));
-        let description = ef(&mut flag, Description::parse(description_org.clone()));
+        let species = ef(&mut flag, Species::parse(species.clone()));
+        let description = ef(&mut flag, Description::parse(description.clone()));
 
         if flag {
             return Err(AnimalValidationError {

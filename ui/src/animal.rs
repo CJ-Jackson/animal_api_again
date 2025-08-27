@@ -52,6 +52,7 @@ pub fn Animal() -> Element {
     };
 
     let animal_error_clone = animal_error.cloned().unwrap_or_default();
+    let animal_value_clone = animal_value.cloned();
 
     rsx! {
         Title { "Animal" }
@@ -70,7 +71,7 @@ pub fn Animal() -> Element {
         form { class: "form", onsubmit: submit,
             label { class:"form-label", r#for: "species", "Species" }
             input { class:"form-item", id: "species", type: "text", placeholder: "Species",
-                name: "species", value: animal_value.cloned().species,
+                name: "species", value: animal_value_clone.species,
                 oninput: move |e| {
                     animal_input.species(e.value());
                 },
@@ -80,7 +81,7 @@ pub fn Animal() -> Element {
             }
             label { class:"form-label", r#for: "description", "Description" }
             input { class:"form-item", id: "description", type: "text", placeholder: "Description",
-                name: "description", value: animal_value.cloned().description,
+                name: "description", value: animal_value_clone.description,
                 oninput: move |e| {
                     animal_input.description(e.value());
                 },
@@ -100,7 +101,9 @@ pub fn EditAnimal(id: i64) -> Element {
     let mut animal_value = use_signal(|| AnimalModel::default());
     let mut animal_error = use_signal(|| Option::<AnimalValidationError>::None);
 
-    if animal_error.cloned().is_none() {
+    let animal_error_clone = animal_error.cloned();
+
+    if animal_error_clone.is_none() {
         animal_input.set(animal.cloned().unwrap_or_default());
         animal_value.set(animal.cloned().unwrap_or_default());
     }
@@ -120,7 +123,8 @@ pub fn EditAnimal(id: i64) -> Element {
         }
     };
 
-    let animal_error_clone = animal_error.cloned().unwrap_or_default();
+    let animal_error_clone = animal_error_clone.unwrap_or_default();
+    let animal_value_clone = animal_value.cloned();
 
     rsx! {
         Title { "Edit Animal" }
@@ -128,7 +132,7 @@ pub fn EditAnimal(id: i64) -> Element {
         form { class: "form", onsubmit: submit,
             label { class:"form-label", r#for: "species", "Species" }
             input { class:"form-item", type: "text", placeholder: "Species",
-                name: "species", id: "species", value: animal_value.cloned().species,
+                name: "species", id: "species", value: animal_value_clone.species,
                 oninput: move |e| {
                     animal_input.species(e.value());
                 }
@@ -138,7 +142,7 @@ pub fn EditAnimal(id: i64) -> Element {
             }
             label { class:"form-label", r#for: "description", "Description" }
             input { class:"form-item", type: "text", placeholder: "Description",
-                name: "description", id: "description", value: animal_value.cloned().description,
+                name: "description", id: "description", value: animal_value_clone.description,
                 oninput: move |e| {
                     animal_input.description(e.value());
                 }
