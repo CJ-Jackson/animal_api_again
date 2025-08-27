@@ -33,11 +33,7 @@ pub fn Animal() -> Element {
 
     let submit = move || async move {
         let animal = animal_input.cloned();
-        add_animal(AnimalAddUpdateModel {
-            species: animal.species,
-            description: animal.description,
-        })
-        .await;
+        add_animal(animal.into()).await;
         animal_value.reset();
         animals.restart();
     };
@@ -92,14 +88,7 @@ pub fn EditAnimal(id: i64) -> Element {
 
     let submit = move || async move {
         let animal = animal_input.cloned();
-        edit_animal(
-            id,
-            AnimalAddUpdateModel {
-                species: animal.species,
-                description: animal.description,
-            },
-        )
-        .await;
+        edit_animal(id, animal.into()).await;
         nav.push(Route::Animal {});
     };
 

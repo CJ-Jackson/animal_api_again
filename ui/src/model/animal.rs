@@ -7,6 +7,15 @@ pub struct AnimalModel {
     pub description: String,
 }
 
+impl Into<AnimalAddUpdateModel> for AnimalModel {
+    fn into(self) -> AnimalAddUpdateModel {
+        AnimalAddUpdateModel {
+            species: self.species,
+            description: self.description,
+        }
+    }
+}
+
 #[derive(Debug, Serialize)]
 pub struct AnimalAddUpdateModel {
     pub species: String,
