@@ -19,8 +19,11 @@ pub struct AnimalApi;
 impl AnimalApi {
     /// Fetch All Animals
     #[oai(path = "/", method = "get")]
-    async fn index(&self, animal_repository: Dep<AnimalRepository>) -> FetchAllAnimalsResponse {
-        match animal_repository.0.fetch_all_animals() {
+    async fn index(
+        &self,
+        Dep(animal_repository): Dep<AnimalRepository>,
+    ) -> FetchAllAnimalsResponse {
+        match animal_repository.fetch_all_animals() {
             Ok(animal) => FetchAllAnimalsResponse::Ok(Json(animal.to_vec())),
             Err(_) => FetchAllAnimalsResponse::InternalServerError,
         }
@@ -31,9 +34,9 @@ impl AnimalApi {
     async fn fetch_by_id(
         &self,
         Path(id): Path<u64>,
-        animal_repository: Dep<AnimalRepository>,
+        Dep(animal_repository): Dep<AnimalRepository>,
     ) -> FetchAnimalByIdResponse {
-        match animal_repository.0.fetch_animal_by_id(id as i64) {
+        match animal_repository.fetch_animal_by_id(id as i64) {
             Ok(animal) => FetchAnimalByIdResponse::Ok(Json(animal)),
             Err(_) => FetchAnimalByIdResponse::NotFound,
         }
@@ -43,10 +46,10 @@ impl AnimalApi {
     #[oai(path = "/add", method = "post")]
     async fn add(
         &self,
-        animal: Json<AnimalAddUpdateObject>,
-        animal_repository: Dep<AnimalRepository>,
+        Json(animal): Json<AnimalAddUpdateObject>,
+        Dep(animal_repository): Dep<AnimalRepository>,
     ) -> AddAnimalResponse {
-        match animal_repository.0.add_animal(&animal.0) {
+        match animal_repository.add_animal(&animal) {
             Ok(_) => AddAnimalResponse::Created,
             Err(_) => AddAnimalResponse::BadRequest,
         }
@@ -57,10 +60,10 @@ impl AnimalApi {
     async fn update_animal(
         &self,
         Path(id): Path<u64>,
-        animal: Json<AnimalAddUpdateObject>,
-        animal_repository: Dep<AnimalRepository>,
+        Json(animal): Json<AnimalAddUpdateObject>,
+        Dep(animal_repository): Dep<AnimalRepository>,
     ) -> UpdateAnimalResponse {
-        match animal_repository.0.update_animal(&animal.0, id as i64) {
+        match animal_repository.update_animal(&animal, id as i64) {
             Ok(_) => UpdateAnimalResponse::Ok,
             Err(_) => UpdateAnimalResponse::NotFound,
         }
