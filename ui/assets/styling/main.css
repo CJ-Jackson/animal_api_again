@@ -7,6 +7,7 @@
     'Noto Color Emoji';
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
     monospace;
+    --color-red-500: oklch(63.7% 0.237 25.331);
     --color-sky-500: oklch(68.5% 0.169 237.323);
     --color-gray-600: oklch(44.6% 0.03 256.802);
     --color-white: #fff;
@@ -258,6 +259,15 @@
     padding-left: calc(var(--spacing) * 2);
     font-size: var(--text-lg);
     line-height: var(--tw-leading, var(--text-lg--line-height));
+  }
+}
+.error {
+  color: var(--color-red-500);
+}
+ul.error {
+  list-style-type: disc;
+  li {
+    margin-bottom: calc(var(--spacing) * 2);
   }
 }
 @property --tw-rotate-x {

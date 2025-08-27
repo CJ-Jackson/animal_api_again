@@ -3,7 +3,7 @@ use crate::validation::types::description::{Description, DescriptionError};
 use crate::validation::types::species::{Species, SpeciesError};
 use thiserror::Error;
 
-#[derive(Debug, Error, Clone)]
+#[derive(Debug, Error, Clone, PartialEq)]
 #[error("Animal validation error")]
 pub struct AnimalValidationError {
     pub species: Result<Species, SpeciesError>,

@@ -3,7 +3,7 @@ use crate::validation::types::ValidationCheck;
 use std::sync::Arc;
 use thiserror::Error;
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, PartialEq, Default)]
 #[error("Description Validation Error")]
 pub struct DescriptionError(pub Arc<[String]>);
 
@@ -23,7 +23,7 @@ impl Clone for DescriptionError {
     }
 }
 
-#[derive(Default, Clone, Debug)]
+#[derive(Default, Clone, Debug, PartialEq)]
 pub struct Description(String);
 
 impl Description {
