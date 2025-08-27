@@ -2,6 +2,7 @@
 
 mod animal;
 pub mod api;
+pub mod ext;
 pub mod model;
 
 pub use animal::Animal;
