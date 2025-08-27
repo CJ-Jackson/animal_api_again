@@ -1,6 +1,6 @@
 use crate::api::animal::{add_animal, edit_animal, fetch_all_animals, fetch_animal_by_id};
 use crate::ext::ResetSignal;
-use crate::model::animal::{AnimalAddUpdateModel, AnimalModel};
+use crate::model::animal::{AnimalAddUpdateModel, AnimalModel, AnimalModelSignal};
 use dioxus::document::Title;
 use dioxus::prelude::*;
 
@@ -57,16 +57,14 @@ pub fn Animal() -> Element {
             input { class:"form-item", id: "species", type: "text", placeholder: "Species",
                 name: "species", value: animal_value.cloned().species,
                 oninput: move |e| {
-                    let mut a = animal_input.write();
-                    a.species = e.value();
+                    animal_input.species(e.value());
                 },
             }
             label { class:"form-label", r#for: "description", "Description" }
             input { class:"form-item", id: "description", type: "text", placeholder: "Description",
                 name: "description", value: animal_value.cloned().description,
                 oninput: move |e| {
-                    let mut a = animal_input.write();
-                    a.description = e.value();
+                    animal_input.description(e.value());
                 },
             }
             button { class: "btn btn-skyblue", type: "submit", "Add"}
@@ -80,11 +78,7 @@ pub fn EditAnimal(id: i64) -> Element {
 
     let animal = use_resource(move || async move { fetch_animal_by_id(id).await });
     let mut animal_input = use_signal(|| AnimalModel::default());
-    {
-        let mut a = animal_input.write();
-        a.species = animal.cloned().unwrap_or_default().species;
-        a.description = animal.cloned().unwrap_or_default().description;
-    }
+    animal_input.set(animal.cloned().unwrap_or_default());
 
     let submit = move || async move {
         let animal = animal_input.cloned();
@@ -100,16 +94,14 @@ pub fn EditAnimal(id: i64) -> Element {
             input { class:"form-item", type: "text", placeholder: "Species",
                 name: "species", id: "species", value: animal.cloned().unwrap_or_default().species,
                 oninput: move |e| {
-                    let mut a = animal_input.write();
-                    a.species = e.value();
+                    animal_input.species(e.value());
                 }
             }
             label { class:"form-label", r#for: "description", "Description" }
             input { class:"form-item", type: "text", placeholder: "Description",
                 name: "description", id: "description", value: animal.cloned().unwrap_or_default().description,
                 oninput: move |e| {
-                    let mut a = animal_input.write();
-                    a.description = e.value();
+                    animal_input.description(e.value());
                 }
             },
             button { class: "btn btn-skyblue", type: "submit", "Edit"}
