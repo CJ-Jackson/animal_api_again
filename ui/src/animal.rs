@@ -3,6 +3,10 @@ use crate::ext::ResetSignal;
 use crate::model::animal::{AnimalModel, AnimalModelSignal};
 use dioxus::document::Title;
 use dioxus::prelude::*;
+use shared::validation::models::animal::AnimalValidationError;
+use shared::validation::types::description::DescriptionError;
+use shared::validation::types::species::SpeciesError;
+use std::sync::Arc;
 
 const MAIN_CSS: Asset = asset!("/assets/styling/main.css");
 
@@ -30,13 +34,24 @@ pub fn Animal() -> Element {
     let mut animals = use_resource(|| async move { fetch_all_animals().await });
     let mut animal_input = use_signal(|| AnimalModel::default());
     let mut animal_value = use_signal(|| AnimalModel::default());
+    let mut animal_error = use_signal(|| Option::<AnimalValidationError>::None);
 
-    let submit = move || async move {
+    let submit = move |_| async move {
         let animal = animal_input.cloned();
-        add_animal(animal.into()).await;
-        animal_value.reset();
-        animals.restart();
+        match animal.validate() {
+            Ok(animal_validated) => {
+                add_animal(animal_validated.into()).await;
+                animal_value.reset();
+                animals.restart();
+            }
+            Err(error) => {
+                animal_value.set(animal.merge_with_validate_error(&error));
+                animal_error.set(Some(error));
+            }
+        }
     };
+
+    let animal_error_clone = animal_error.cloned().unwrap_or_default();
 
     rsx! {
         Title { "Animal" }
@@ -52,13 +67,16 @@ pub fn Animal() -> Element {
                 }
             }
         }
-        form { class: "form", onsubmit: move |_| async move { submit().await },
+        form { class: "form", onsubmit: submit,
             label { class:"form-label", r#for: "species", "Species" }
             input { class:"form-item", id: "species", type: "text", placeholder: "Species",
                 name: "species", value: animal_value.cloned().species,
                 oninput: move |e| {
                     animal_input.species(e.value());
                 },
+            }
+            if let Err(SpeciesError(msgs)) = animal_error_clone.species {
+                ErrorMessage { msgs }
             }
             label { class:"form-label", r#for: "description", "Description" }
             input { class:"form-item", id: "description", type: "text", placeholder: "Description",
@@ -67,6 +85,9 @@ pub fn Animal() -> Element {
                     animal_input.description(e.value());
                 },
             }
+            if let Err(DescriptionError(msgs)) = animal_error_clone.description {
+                ErrorMessage { msgs }
+            }
             button { class: "btn btn-skyblue", type: "submit", "Add"}
         }
     }
@@ -74,38 +95,70 @@ pub fn Animal() -> Element {
 
 #[component]
 pub fn EditAnimal(id: i64) -> Element {
-    let nav = navigator();
-
     let animal = use_resource(move || async move { fetch_animal_by_id(id).await });
     let mut animal_input = use_signal(|| AnimalModel::default());
-    animal_input.set(animal.cloned().unwrap_or_default());
+    let mut animal_value = use_signal(|| AnimalModel::default());
+    let mut animal_error = use_signal(|| Option::<AnimalValidationError>::None);
 
-    let submit = move || async move {
+    if animal_error.cloned().is_none() {
+        animal_input.set(animal.cloned().unwrap_or_default());
+        animal_value.set(animal.cloned().unwrap_or_default());
+    }
+
+    let submit = move |_| async move {
         let animal = animal_input.cloned();
-        edit_animal(id, animal.into()).await;
-        nav.push(Route::Animal {});
+        match animal.validate() {
+            Ok(animal_validated) => {
+                edit_animal(id, animal_validated.into()).await;
+                animal_error.reset();
+                navigator().push(Route::Animal {});
+            }
+            Err(error) => {
+                animal_value.set(animal.merge_with_validate_error(&error));
+                animal_error.set(Some(error));
+            }
+        }
     };
+
+    let animal_error_clone = animal_error.cloned().unwrap_or_default();
 
     rsx! {
         Title { "Edit Animal" }
         h1 { "Edit Animal" }
-        form { class: "form", onsubmit: move |_| async move { submit().await },
+        form { class: "form", onsubmit: submit,
             label { class:"form-label", r#for: "species", "Species" }
             input { class:"form-item", type: "text", placeholder: "Species",
-                name: "species", id: "species", value: animal.cloned().unwrap_or_default().species,
+                name: "species", id: "species", value: animal_value.cloned().species,
                 oninput: move |e| {
                     animal_input.species(e.value());
                 }
             }
+            if let Err(SpeciesError(msgs)) = animal_error_clone.species {
+                ErrorMessage { msgs }
+            }
             label { class:"form-label", r#for: "description", "Description" }
             input { class:"form-item", type: "text", placeholder: "Description",
-                name: "description", id: "description", value: animal.cloned().unwrap_or_default().description,
+                name: "description", id: "description", value: animal_value.cloned().description,
                 oninput: move |e| {
                     animal_input.description(e.value());
                 }
-            },
+            }
+            if let Err(DescriptionError(msgs)) = animal_error_clone.description {
+                ErrorMessage { msgs }
+            }
             button { class: "btn btn-skyblue", type: "submit", "Edit"}
         }
         Link { class: "btn btn-skyblue inline-block", to: Route::Animal { }, "Back to Animal" }
+    }
+}
+
+#[component]
+pub fn ErrorMessage(msgs: Arc<[String]>) -> Element {
+    rsx! {
+        ul { class: "error",
+            for msg in msgs.iter() {
+                li { class: "error-item", "{msg}" }
+            }
+        }
     }
 }

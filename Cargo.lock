@@ -158,6 +158,7 @@ dependencies = [
  "rusqlite",
  "serde",
  "serde_json",
+ "shared",
  "thiserror 2.0.16",
  "tokio",
  "unicode-segmentation",
@@ -4438,6 +4439,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "shared"
+version = "0.1.0"
+dependencies = [
+ "thiserror 2.0.16",
+ "unicode-segmentation",
+]
+
+[[package]]
 name = "shlex"
 version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5223,6 +5232,7 @@ dependencies = [
  "dioxus",
  "reqwest",
  "serde",
+ "shared",
 ]
 
 [[package]]

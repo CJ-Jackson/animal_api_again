@@ -7,3 +7,4 @@ edition = "2024"
 dioxus = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
+shared = { workspace = true }
