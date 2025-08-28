@@ -13,24 +13,22 @@ impl AnimalModel {
     pub fn validate(&self) -> Result<AnimalValidated, AnimalValidationError> {
         AnimalValidated::parse(self.species.clone(), self.description.clone())
     }
+}
 
-    pub fn merge_with_validate_error(
-        &self,
-        AnimalValidationError {
-            species,
-            description,
-        }: &AnimalValidationError,
-    ) -> Self {
+impl From<(&AnimalValidationError, &AnimalModel)> for AnimalModel {
+    fn from((error, model): (&AnimalValidationError, &AnimalModel)) -> Self {
         Self {
             id: 0,
-            species: species
+            species: error
+                .species
                 .clone()
                 .map(|s| s.as_str().to_string())
-                .unwrap_or(self.species.clone()),
-            description: description
+                .unwrap_or(model.species.clone()),
+            description: error
+                .description
                 .clone()
                 .map(|s| s.as_str().to_string())
-                .unwrap_or(self.description.clone()),
+                .unwrap_or(model.description.clone()),
         }
     }
 }

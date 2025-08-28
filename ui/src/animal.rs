@@ -45,7 +45,7 @@ pub fn Animal() -> Element {
                 animals.restart();
             }
             Err(error) => {
-                animal_value.set(animal.merge_with_validate_error(&error));
+                animal_value.set((&error, &animal).into());
                 animal_error.set(Some(error));
             }
         }
@@ -99,7 +99,7 @@ pub fn EditAnimal(id: i64) -> Element {
                 navigator().push(Route::Animal {});
             }
             Err(error) => {
-                animal_value.set(animal.merge_with_validate_error(&error));
+                animal_value.set((&error, &animal).into());
                 animal_error.set(Some(error));
             }
         }
