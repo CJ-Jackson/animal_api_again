@@ -49,8 +49,8 @@ impl AnimalApi {
         Json(animal): Json<AnimalAddUpdateObject>,
         Dep(animal_repository): Dep<AnimalRepository>,
     ) -> AddAnimalResponse {
-        if animal.to_validate().is_err() {
-            return AddAnimalResponse::UnprocessableEntity;
+        if let Err(animal_err) = animal.to_validate() {
+            return AddAnimalResponse::UnprocessableEntity(Json(animal_err.into()));
         }
         match animal_repository.add_animal(&animal) {
             Ok(_) => AddAnimalResponse::Created,
@@ -66,8 +66,8 @@ impl AnimalApi {
         Json(animal): Json<AnimalAddUpdateObject>,
         Dep(animal_repository): Dep<AnimalRepository>,
     ) -> UpdateAnimalResponse {
-        if animal.to_validate().is_err() {
-            return UpdateAnimalResponse::UnprocessableEntity;
+        if let Err(animal_err) = animal.to_validate() {
+            return UpdateAnimalResponse::UnprocessableEntity(Json(animal_err.into()));
         }
         match animal_repository.update_animal(&animal, id as i64) {
             Ok(_) => UpdateAnimalResponse::Ok,

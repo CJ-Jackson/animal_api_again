@@ -1,4 +1,4 @@
-use crate::animal::object::AnimalObject;
+use crate::animal::object::{AnimalErrorObject, AnimalObject};
 use poem_openapi::ApiResponse;
 use poem_openapi::payload::Json;
 
@@ -23,7 +23,7 @@ pub enum AddAnimalResponse {
     #[oai(status = 201)]
     Created,
     #[oai(status = 422)]
-    UnprocessableEntity,
+    UnprocessableEntity(Json<AnimalErrorObject>),
     #[oai(status = 400)]
     BadRequest,
 }
@@ -33,7 +33,7 @@ pub enum UpdateAnimalResponse {
     #[oai(status = 200)]
     Ok,
     #[oai(status = 422)]
-    UnprocessableEntity,
+    UnprocessableEntity(Json<AnimalErrorObject>),
     #[oai(status = 404)]
     NotFound,
 }
