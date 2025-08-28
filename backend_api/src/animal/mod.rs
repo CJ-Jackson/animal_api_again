@@ -9,6 +9,7 @@ use crate::animal::response::{
     AddAnimalResponse, FetchAllAnimalsResponse, FetchAnimalByIdResponse, UpdateAnimalResponse,
 };
 use crate::common::context::Dep;
+use crate::common::results::merge_result_future;
 use poem_openapi::OpenApi;
 use poem_openapi::param::Path;
 use poem_openapi::payload::Json;
@@ -23,10 +24,13 @@ impl AnimalApi {
         &self,
         Dep(animal_repository): Dep<AnimalRepository>,
     ) -> FetchAllAnimalsResponse {
-        match animal_repository.fetch_all_animals() {
-            Ok(animal) => FetchAllAnimalsResponse::Ok(Json(animal.to_vec())),
-            Err(_) => FetchAllAnimalsResponse::InternalServerError,
-        }
+        merge_result_future(async {
+            animal_repository
+                .fetch_all_animals()
+                .map(|animal| FetchAllAnimalsResponse::Ok(Json(animal.to_vec())))
+                .map_err(|_| FetchAllAnimalsResponse::InternalServerError)
+        })
+        .await
     }
 
     /// Fetch Animal By ID
@@ -36,10 +40,13 @@ impl AnimalApi {
         Path(id): Path<u64>,
         Dep(animal_repository): Dep<AnimalRepository>,
     ) -> FetchAnimalByIdResponse {
-        match animal_repository.fetch_animal_by_id(id as i64) {
-            Ok(animal) => FetchAnimalByIdResponse::Ok(Json(animal)),
-            Err(_) => FetchAnimalByIdResponse::NotFound,
-        }
+        merge_result_future(async {
+            animal_repository
+                .fetch_animal_by_id(id as i64)
+                .map(|animal| FetchAnimalByIdResponse::Ok(Json(animal)))
+                .map_err(|_| FetchAnimalByIdResponse::NotFound)
+        })
+        .await
     }
 
     /// Add Animal
@@ -49,13 +56,16 @@ impl AnimalApi {
         Json(animal): Json<AnimalAddUpdateObject>,
         Dep(animal_repository): Dep<AnimalRepository>,
     ) -> AddAnimalResponse {
-        if let Err(animal_err) = animal.to_validate() {
-            return AddAnimalResponse::UnprocessableEntity(Json(animal_err.into()));
-        }
-        match animal_repository.add_animal(&animal) {
-            Ok(_) => AddAnimalResponse::Created,
-            Err(_) => AddAnimalResponse::BadRequest,
-        }
+        merge_result_future(async {
+            animal.to_validate().map_err(|animal_err| {
+                AddAnimalResponse::UnprocessableEntity(Json(animal_err.into()))
+            })?;
+            animal_repository
+                .add_animal(&animal)
+                .map(|_| AddAnimalResponse::Created)
+                .map_err(|_| AddAnimalResponse::BadRequest)
+        })
+        .await
     }
 
     /// Update Animal
@@ -66,12 +76,15 @@ impl AnimalApi {
         Json(animal): Json<AnimalAddUpdateObject>,
         Dep(animal_repository): Dep<AnimalRepository>,
     ) -> UpdateAnimalResponse {
-        if let Err(animal_err) = animal.to_validate() {
-            return UpdateAnimalResponse::UnprocessableEntity(Json(animal_err.into()));
-        }
-        match animal_repository.update_animal(&animal, id as i64) {
-            Ok(_) => UpdateAnimalResponse::Ok,
-            Err(_) => UpdateAnimalResponse::NotFound,
-        }
+        merge_result_future(async {
+            animal.to_validate().map_err(|animal_error| {
+                UpdateAnimalResponse::UnprocessableEntity(Json(animal_error.into()))
+            })?;
+            animal_repository
+                .update_animal(&animal, id as i64)
+                .map(|_| UpdateAnimalResponse::Ok)
+                .map_err(|_| UpdateAnimalResponse::NotFound)
+        })
+        .await
     }
 }
