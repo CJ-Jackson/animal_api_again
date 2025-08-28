@@ -9,7 +9,7 @@ use crate::animal::response::{
     AddAnimalResponse, FetchAllAnimalsResponse, FetchAnimalByIdResponse, UpdateAnimalResponse,
 };
 use crate::common::context::Dep;
-use crate::common::results::merge_result_future;
+use crate::common::results::unified;
 use poem_openapi::OpenApi;
 use poem_openapi::param::Path;
 use poem_openapi::payload::Json;
@@ -24,7 +24,7 @@ impl AnimalApi {
         &self,
         Dep(animal_repository): Dep<AnimalRepository>,
     ) -> FetchAllAnimalsResponse {
-        merge_result_future(async {
+        unified(async {
             animal_repository
                 .fetch_all_animals()
                 .map(|animal| FetchAllAnimalsResponse::Ok(Json(animal.to_vec())))
@@ -40,7 +40,7 @@ impl AnimalApi {
         Path(id): Path<u64>,
         Dep(animal_repository): Dep<AnimalRepository>,
     ) -> FetchAnimalByIdResponse {
-        merge_result_future(async {
+        unified(async {
             animal_repository
                 .fetch_animal_by_id(id as i64)
                 .map(|animal| FetchAnimalByIdResponse::Ok(Json(animal)))
@@ -56,7 +56,7 @@ impl AnimalApi {
         Json(animal): Json<AnimalAddUpdateObject>,
         Dep(animal_repository): Dep<AnimalRepository>,
     ) -> AddAnimalResponse {
-        merge_result_future(async {
+        unified(async {
             animal.to_validate().map_err(|animal_err| {
                 AddAnimalResponse::UnprocessableEntity(Json(animal_err.into()))
             })?;
@@ -76,7 +76,7 @@ impl AnimalApi {
         Json(animal): Json<AnimalAddUpdateObject>,
         Dep(animal_repository): Dep<AnimalRepository>,
     ) -> UpdateAnimalResponse {
-        merge_result_future(async {
+        unified(async {
             animal.to_validate().map_err(|animal_error| {
                 UpdateAnimalResponse::UnprocessableEntity(Json(animal_error.into()))
             })?;

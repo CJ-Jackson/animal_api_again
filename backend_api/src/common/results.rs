@@ -1,4 +1,4 @@
-pub async fn merge_result_future<T, FUT>(fut: FUT) -> T
+pub async fn unified<T, FUT>(fut: FUT) -> T
 where
     FUT: Future<Output = Result<T, T>>,
 {
