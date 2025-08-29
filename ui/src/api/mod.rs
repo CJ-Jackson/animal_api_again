@@ -17,4 +17,4 @@ fn get_client() -> Client {
 
 #[derive(Debug, Error)]
 #[error("Api Client Error")]
-pub struct ApiClentError;
+pub struct ApiClientError;
