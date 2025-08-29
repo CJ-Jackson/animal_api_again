@@ -1,7 +1,8 @@
-use crate::api::{get_client, get_url};
+use crate::api::{ApiClentError, get_client, get_url};
 use crate::model::animal::{AnimalAddUpdateModel, AnimalModel};
+use error_stack::{Report, ResultExt};
 
-fn default_animals() -> Vec<AnimalModel> {
+pub fn default_animals() -> Vec<AnimalModel> {
     let mut v: Vec<AnimalModel> = vec![];
     v.push(AnimalModel {
         id: 0,
@@ -11,70 +12,57 @@ fn default_animals() -> Vec<AnimalModel> {
     v
 }
 
-pub async fn fetch_all_animals() -> Vec<AnimalModel> {
+pub async fn fetch_all_animals() -> Result<Vec<AnimalModel>, Report<ApiClentError>> {
     let client = get_client();
-    let req = client.get(format!("{}/animal", get_url())).build();
-    let req = match req {
-        Ok(req) => req,
-        Err(_) => return default_animals(),
-    };
+    let req = client
+        .get(format!("{}/animal", get_url()))
+        .build()
+        .change_context(ApiClentError)?;
 
-    let res = client.execute(req).await;
-    match res {
-        Ok(res) => {
-            let output = res.json::<Vec<AnimalModel>>().await;
-            output.unwrap_or_else(|_| default_animals())
-        }
-        Err(_) => default_animals(),
-    }
+    let res = client.execute(req).await.change_context(ApiClentError)?;
+    Ok(res
+        .json::<Vec<AnimalModel>>()
+        .await
+        .change_context(ApiClentError)?)
 }
 
-pub async fn fetch_animal_by_id(id: i64) -> AnimalModel {
+pub async fn fetch_animal_by_id(id: i64) -> Result<AnimalModel, Report<ApiClentError>> {
     let client = get_client();
     let req = client
         .get(format!("{}/animal/fetch/{}", get_url(), id))
-        .build();
-    let req = match req {
-        Ok(req) => req,
-        Err(_) => return AnimalModel::default(),
-    };
+        .build()
+        .change_context(ApiClentError)?;
 
-    let res = client.execute(req).await;
-    match res {
-        Ok(res) => {
-            let output = res.json::<AnimalModel>().await;
-            output.unwrap_or_else(|_| AnimalModel::default())
-        }
-        Err(_) => AnimalModel::default(),
-    }
+    let res = client.execute(req).await.change_context(ApiClentError)?;
+    Ok(res
+        .json::<AnimalModel>()
+        .await
+        .change_context(ApiClentError)?)
 }
 
-pub async fn add_animal(animal: AnimalAddUpdateModel) {
+pub async fn add_animal(animal: AnimalAddUpdateModel) -> Result<(), Report<ApiClentError>> {
     let client = get_client();
     let req = client
         .post(format!("{}/animal/add", get_url()))
         .json(&animal)
-        .build();
+        .build()
+        .change_context(ApiClentError)?;
 
-    match req {
-        Ok(req) => {
-            _ = client.execute(req).await;
-        }
-        Err(_) => {}
-    }
+    _ = client.execute(req).await.change_context(ApiClentError)?;
+    Ok(())
 }
 
-pub async fn edit_animal(id: i64, animal: AnimalAddUpdateModel) {
+pub async fn edit_animal(
+    id: i64,
+    animal: AnimalAddUpdateModel,
+) -> Result<(), Report<ApiClentError>> {
     let client = get_client();
     let req = client
         .patch(format!("{}/animal/update/{}", get_url(), id))
         .json(&animal)
-        .build();
+        .build()
+        .change_context(ApiClentError)?;
 
-    match req {
-        Ok(req) => {
-            _ = client.execute(req).await;
-        }
-        Err(_) => {}
-    }
+    _ = client.execute(req).await.change_context(ApiClentError)?;
+    Ok(())
 }

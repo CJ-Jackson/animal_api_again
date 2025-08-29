@@ -17,6 +17,8 @@ enum Route {
     Animal {},
     #[route("/edit/:id")]
     EditAnimal { id: i64 },
+    #[route("/error")]
+    ErrorPage {},
 }
 
 #[component]
@@ -30,8 +32,23 @@ pub fn UiApp() -> Element {
 }
 
 #[component]
+pub fn ErrorPage() -> Element {
+    rsx! {
+        Title { "Error" }
+        h1 { "Error" }
+        p { "Unable to fetch data" }
+        Link { class: "btn btn-skyblue", to: Route::Animal {}, "Restart" }
+    }
+}
+
+#[component]
 pub fn Animal() -> Element {
-    let mut animals = use_resource(|| async move { fetch_all_animals().await });
+    let mut animals = use_resource(|| async move {
+        fetch_all_animals().await.unwrap_or_else(|_| {
+            navigator().push(Route::ErrorPage {});
+            vec![]
+        })
+    });
     let animal_input = use_signal(|| AnimalModel::default());
     let mut animal_value = use_signal(|| AnimalModel::default());
     let mut animal_error = use_signal(|| Option::<AnimalValidationError>::None);
@@ -40,9 +57,14 @@ pub fn Animal() -> Element {
         let animal = animal_input.cloned();
         match animal.validate() {
             Ok(animal_validated) => {
-                add_animal(animal_validated.into()).await;
                 animal_value.reset();
+                animal_error.reset();
                 animals.restart();
+                add_animal(animal_validated.into())
+                    .await
+                    .unwrap_or_else(|_| {
+                        navigator().push(Route::ErrorPage {});
+                    });
             }
             Err(error) => {
                 animal_value.set((&error, &animal).into());
@@ -78,7 +100,12 @@ pub fn Animal() -> Element {
 
 #[component]
 pub fn EditAnimal(id: i64) -> Element {
-    let animal = use_resource(move || async move { fetch_animal_by_id(id).await });
+    let animal = use_resource(move || async move {
+        fetch_animal_by_id(id).await.unwrap_or_else(|_| {
+            navigator().push(Route::ErrorPage {});
+            AnimalModel::default()
+        })
+    });
     let mut animal_input = use_signal(|| AnimalModel::default());
     let mut animal_value = use_signal(|| AnimalModel::default());
     let mut animal_error = use_signal(|| Option::<AnimalValidationError>::None);
@@ -94,8 +121,12 @@ pub fn EditAnimal(id: i64) -> Element {
         let animal = animal_input.cloned();
         match animal.validate() {
             Ok(animal_validated) => {
-                edit_animal(id, animal_validated.into()).await;
                 animal_error.reset();
+                edit_animal(id, animal_validated.into())
+                    .await
+                    .unwrap_or_else(|_| {
+                        navigator().push(Route::ErrorPage {});
+                    });
                 navigator().push(Route::Animal {});
             }
             Err(error) => {

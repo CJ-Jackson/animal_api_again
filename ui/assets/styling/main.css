@@ -9,6 +9,7 @@
     monospace;
     --color-red-500: oklch(63.7% 0.237 25.331);
     --color-sky-500: oklch(68.5% 0.169 237.323);
+    --color-sky-600: oklch(58.8% 0.158 241.966);
     --color-gray-100: oklch(96.7% 0.003 264.542);
     --color-gray-600: oklch(44.6% 0.03 256.802);
     --color-gray-900: oklch(21% 0.034 264.665);
@@ -252,6 +253,11 @@ body {
 }
 .btn-skyblue {
   background-color: var(--color-sky-500);
+  &:hover {
+    @media (hover: hover) {
+      background-color: var(--color-sky-600);
+    }
+  }
 }
 .form {
   display: flex;

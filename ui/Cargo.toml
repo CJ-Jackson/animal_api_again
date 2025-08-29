@@ -8,3 +8,5 @@ dioxus = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
 shared = { workspace = true }
+thiserror = { workspace = true }
+error-stack = { workspace = true }

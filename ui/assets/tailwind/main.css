@@ -35,7 +35,7 @@ body {
 }
 
 .btn-skyblue {
-    @apply bg-sky-500;
+    @apply bg-sky-500 hover:bg-sky-600;
 }
 
 
