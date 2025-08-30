@@ -53,22 +53,25 @@ pub fn Animal() -> Element {
     let mut animal_value = use_signal(|| AnimalModel::default());
     let mut animal_error = use_signal(|| Option::<AnimalValidationError>::None);
 
-    let submit = move |_| async move {
-        let animal = animal_input.cloned();
-        match animal.validate() {
-            Ok(animal_validated) => {
-                animal_value.reset();
-                animal_error.reset();
-                animals.restart();
-                add_animal(animal_validated.into())
-                    .await
-                    .unwrap_or_else(|_| {
-                        navigator().push(Route::ErrorPage {});
-                    });
-            }
-            Err(error) => {
-                animal_value.set((&error, &animal).into());
-                animal_error.set(Some(error));
+    let submit = move |e: Event<FormData>| {
+        e.prevent_default();
+        async move {
+            let animal = animal_input.cloned();
+            match animal.validate() {
+                Ok(animal_validated) => {
+                    animal_value.reset();
+                    animal_error.reset();
+                    animals.restart();
+                    add_animal(animal_validated.into())
+                        .await
+                        .unwrap_or_else(|_| {
+                            navigator().push(Route::ErrorPage {});
+                        });
+                }
+                Err(error) => {
+                    animal_value.set((&error, &animal).into());
+                    animal_error.set(Some(error));
+                }
             }
         }
     };
@@ -117,21 +120,24 @@ pub fn EditAnimal(id: i64) -> Element {
         animal_value.set(animal.cloned().unwrap_or_default());
     }
 
-    let submit = move |_| async move {
-        let animal = animal_input.cloned();
-        match animal.validate() {
-            Ok(animal_validated) => {
-                animal_error.reset();
-                edit_animal(id, animal_validated.into())
-                    .await
-                    .unwrap_or_else(|_| {
-                        navigator().push(Route::ErrorPage {});
-                    });
-                navigator().push(Route::Animal {});
-            }
-            Err(error) => {
-                animal_value.set((&error, &animal).into());
-                animal_error.set(Some(error));
+    let submit = move |e: Event<FormData>| {
+        e.prevent_default();
+        async move {
+            let animal = animal_input.cloned();
+            match animal.validate() {
+                Ok(animal_validated) => {
+                    animal_error.reset();
+                    edit_animal(id, animal_validated.into())
+                        .await
+                        .unwrap_or_else(|_| {
+                            navigator().push(Route::ErrorPage {});
+                        });
+                    navigator().push(Route::Animal {});
+                }
+                Err(error) => {
+                    animal_value.set((&error, &animal).into());
+                    animal_error.set(Some(error));
+                }
             }
         }
     };

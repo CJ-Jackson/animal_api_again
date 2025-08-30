@@ -3,7 +3,8 @@ use crate::common::config::Config;
 use crate::common::object::Message;
 use error_stack::{Report, ResultExt};
 use poem::listener::TcpListener;
-use poem::{Route, Server};
+use poem::middleware::Cors;
+use poem::{EndpointExt, Route, Server};
 use poem_openapi::payload::Json;
 use poem_openapi::{OpenApi, OpenApiService, Tags};
 use thiserror::Error;
@@ -49,6 +50,9 @@ async fn main() -> Result<(), Report<MainError>> {
     let api_service = OpenApiService::new((HomeApi, AnimalApi), "Animal API", "1.0.0");
     let ui = api_service.swagger_ui();
     let app = Route::new().nest("/", api_service).nest("/docs", ui);
+
+    let cors = Cors::new();
+    let app = app.with(cors);
 
     match config.upgrade() {
         Some(config) => {
