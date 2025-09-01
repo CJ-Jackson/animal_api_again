@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+@utility btn {
+    @apply text-white px-4 py-2 rounded mt-2;
+}
+
+@utility btn-skyblue {
+    @apply bg-sky-500 hover:bg-sky-600;
+}
+
+@utility btn-rubyred {
+    @apply bg-red-500 hover:bg-red-600;
+}
+
+@utility btn-grey {
+    @apply bg-gray-500 hover:bg-gray-600;
+}
+
 body {
     @apply dark:bg-gray-900 bg-gray-100 dark:text-gray-100;
 }
@@ -30,14 +46,6 @@ body {
     }
 }
 
-.btn {
-    @apply text-white px-4 py-2 rounded mt-2;
-}
-
-.btn-skyblue {
-    @apply bg-sky-500 hover:bg-sky-600;
-}
-
 
 .form {
     @apply flex flex-col;
@@ -60,5 +68,25 @@ ul.error {
 
     li {
         @apply mb-2;
+    }
+}
+
+.alert-dialog-backdrop {
+    @apply fixed inset-0 bg-black/50;
+
+    .alert-dialog {
+        @apply fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 p-4 rounded backdrop-opacity-80;
+
+        .alert-dialog-actions {
+            @apply flex justify-end;
+
+            .alert-dialog-cancel {
+                @apply btn btn-grey mr-1;
+            }
+
+            .alert-dialog-action {
+                @apply btn btn-rubyred;
+            }
+        }
     }
 }

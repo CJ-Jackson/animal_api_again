@@ -10,3 +10,5 @@ serde = { workspace = true }
 shared = { workspace = true }
 thiserror = { workspace = true }
 error-stack = { workspace = true }
+
+dioxus-primitives = { git = "https://github.com/DioxusLabs/components" }

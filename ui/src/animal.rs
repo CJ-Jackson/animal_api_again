@@ -3,6 +3,7 @@ use crate::ext::ResetSignal;
 use crate::model::animal::{AnimalModel, AnimalModelSignal};
 use dioxus::document::Title;
 use dioxus::prelude::*;
+use dioxus_primitives::alert_dialog::*;
 use shared::validation::models::animal::AnimalValidationError;
 use shared::validation::types::description::DescriptionError;
 use shared::validation::types::species::SpeciesError;
@@ -52,26 +53,29 @@ pub fn Animal() -> Element {
     let animal_input = use_signal(|| AnimalModel::default());
     let mut animal_value = use_signal(|| AnimalModel::default());
     let mut animal_error = use_signal(|| Option::<AnimalValidationError>::None);
+    let mut open = use_signal(|| false);
 
-    let submit = move |e: Event<FormData>| {
+    let alert = move |e: Event<FormData>| {
         e.prevent_default();
-        async move {
-            let animal = animal_input.cloned();
-            match animal.validate() {
-                Ok(animal_validated) => {
-                    animal_value.reset();
-                    animal_error.reset();
-                    animals.restart();
-                    add_animal(animal_validated.into())
-                        .await
-                        .unwrap_or_else(|_| {
-                            navigator().push(Route::ErrorPage {});
-                        });
-                }
-                Err(error) => {
-                    animal_value.set((&error, &animal).into());
-                    animal_error.set(Some(error));
-                }
+        open.set(true);
+    };
+
+    let submit = move |_| async move {
+        let animal = animal_input.cloned();
+        match animal.validate() {
+            Ok(animal_validated) => {
+                animal_value.reset();
+                animal_error.reset();
+                add_animal(animal_validated.into())
+                    .await
+                    .unwrap_or_else(|_| {
+                        navigator().push(Route::ErrorPage {});
+                    });
+                animals.restart();
+            }
+            Err(error) => {
+                animal_value.set((&error, &animal).into());
+                animal_error.set(Some(error));
             }
         }
     };
@@ -93,10 +97,28 @@ pub fn Animal() -> Element {
                 }
             }
         }
-        form { class: "form", onsubmit: submit,
+        form { class: "form", onsubmit: alert,
             AnimalFormBody { animal_value: animal_value_clone, animal_input: animal_input,
                 animal_validation_error: animal_error_clone }
             button { class: "btn btn-skyblue", type: "submit", "Add"}
+        }
+        AlertDialogRoot {
+            open: open(),
+            on_open_change: move |v| open.set(v),
+            class: "alert-dialog-backdrop",
+            AlertDialogContent { class: "alert-dialog",
+                AlertDialogTitle { "Add item" }
+                AlertDialogDescription { "Are you sure you want to add this item?" }
+                AlertDialogActions {
+                    class: "alert-dialog-actions",
+                    AlertDialogCancel { class: "alert-dialog-cancel", "Cancel" }
+                    AlertDialogAction {
+                        class: "alert-dialog-action",
+                        on_click: submit,
+                        "Confirm"
+                    }
+                }
+            }
         }
     }
 }
