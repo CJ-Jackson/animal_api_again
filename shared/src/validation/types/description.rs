@@ -75,7 +75,7 @@ pub struct Description(String);
 impl Description {
     pub fn parse_custom(
         subject: String,
-        rules: &DescriptionRules,
+        rules: DescriptionRules,
     ) -> Result<Self, DescriptionError> {
         let mut msgs: Vec<String> = vec![];
         let validator = subject.as_string_validator();
@@ -86,7 +86,7 @@ impl Description {
     }
 
     pub fn parse(subject: String) -> Result<Self, DescriptionError> {
-        Self::parse_custom(subject, &DescriptionRules::default())
+        Self::parse_custom(subject, DescriptionRules::default())
     }
 
     pub fn as_str(&self) -> &str {

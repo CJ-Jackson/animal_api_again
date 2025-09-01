@@ -73,7 +73,7 @@ impl Clone for SpeciesError {
 pub struct Species(String);
 
 impl Species {
-    pub fn parse_custom(subject: String, rules: &SpeciesRules) -> Result<Self, SpeciesError> {
+    pub fn parse_custom(subject: String, rules: SpeciesRules) -> Result<Self, SpeciesError> {
         let mut msgs: Vec<String> = vec![];
         let validator = subject.as_string_validator();
         rules.check(&mut msgs, &validator);
@@ -82,7 +82,7 @@ impl Species {
     }
 
     pub fn parse(subject: String) -> Result<Self, SpeciesError> {
-        Self::parse_custom(subject, &SpeciesRules::default())
+        Self::parse_custom(subject, SpeciesRules::default())
     }
 
     pub fn as_str(&self) -> &str {
