@@ -16,6 +16,10 @@
     @apply bg-gray-500 hover:bg-gray-600;
 }
 
+@utility btn-green {
+    @apply bg-green-500 hover:bg-green-600;
+}
+
 body {
     @apply dark:bg-gray-900 bg-gray-100 dark:text-gray-100;
 }
@@ -81,11 +85,11 @@ ul.error {
             @apply flex justify-end;
 
             .alert-dialog-cancel {
-                @apply btn btn-grey mr-1;
+                @apply btn btn-rubyred mr-1;
             }
 
             .alert-dialog-action {
-                @apply btn btn-rubyred;
+                @apply btn btn-green;
             }
         }
     }

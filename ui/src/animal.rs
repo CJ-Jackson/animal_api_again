@@ -4,7 +4,7 @@ use crate::model::animal::{AnimalModel, AnimalModelSignal};
 use dioxus::document::Title;
 use dioxus::prelude::*;
 use dioxus_primitives::alert_dialog::*;
-use shared::validation::models::animal::AnimalValidationError;
+use shared::validation::models::animal::{AnimalValidated, AnimalValidationError};
 use shared::validation::types::description::DescriptionError;
 use shared::validation::types::species::SpeciesError;
 use std::sync::Arc;
@@ -52,32 +52,37 @@ pub fn Animal() -> Element {
     });
     let animal_input = use_signal(|| AnimalModel::default());
     let mut animal_value = use_signal(|| AnimalModel::default());
+    let mut animal_validated = use_signal(|| AnimalValidated::default());
     let mut animal_error = use_signal(|| Option::<AnimalValidationError>::None);
     let mut open = use_signal(|| false);
 
     let alert = move |e: Event<FormData>| {
         e.prevent_default();
-        open.set(true);
+        async move {
+            let animal = animal_input.cloned();
+            match animal.validate() {
+                Ok(animal_validated_item) => {
+                    animal_validated.set(animal_validated_item);
+                    open.set(true);
+                }
+                Err(error) => {
+                    animal_value.set((&error, &animal).into());
+                    animal_error.set(Some(error));
+                }
+            }
+        }
     };
 
     let submit = move |_| async move {
-        let animal = animal_input.cloned();
-        match animal.validate() {
-            Ok(animal_validated) => {
-                animal_value.reset();
-                animal_error.reset();
-                add_animal(animal_validated.into())
-                    .await
-                    .unwrap_or_else(|_| {
-                        navigator().push(Route::ErrorPage {});
-                    });
-                animals.restart();
-            }
-            Err(error) => {
-                animal_value.set((&error, &animal).into());
-                animal_error.set(Some(error));
-            }
-        }
+        let validated_animal = animal_validated.cloned();
+        animal_value.reset();
+        animal_error.reset();
+        add_animal(validated_animal.into())
+            .await
+            .unwrap_or_else(|_| {
+                navigator().push(Route::ErrorPage {});
+            });
+        animals.restart();
     };
 
     let animal_error_clone = animal_error.cloned().unwrap_or_default();
@@ -107,15 +112,15 @@ pub fn Animal() -> Element {
             on_open_change: move |v| open.set(v),
             class: "alert-dialog-backdrop",
             AlertDialogContent { class: "alert-dialog",
-                AlertDialogTitle { "Add item" }
-                AlertDialogDescription { "Are you sure you want to add this item?" }
+                AlertDialogTitle { "Add Animal" }
+                AlertDialogDescription { "Are you sure you want to add this animal?" }
                 AlertDialogActions {
                     class: "alert-dialog-actions",
                     AlertDialogCancel { class: "alert-dialog-cancel", "Cancel" }
                     AlertDialogAction {
                         class: "alert-dialog-action",
                         on_click: submit,
-                        "Confirm"
+                        "Add Animal"
                     }
                 }
             }
@@ -133,7 +138,9 @@ pub fn EditAnimal(id: i64) -> Element {
     });
     let mut animal_input = use_signal(|| AnimalModel::default());
     let mut animal_value = use_signal(|| AnimalModel::default());
+    let mut animal_validated = use_signal(|| AnimalValidated::default());
     let mut animal_error = use_signal(|| Option::<AnimalValidationError>::None);
+    let mut open = use_signal(|| false);
 
     let animal_error_clone = animal_error.cloned();
 
@@ -142,19 +149,14 @@ pub fn EditAnimal(id: i64) -> Element {
         animal_value.set(animal.cloned().unwrap_or_default());
     }
 
-    let submit = move |e: Event<FormData>| {
+    let alert = move |e: Event<FormData>| {
         e.prevent_default();
         async move {
             let animal = animal_input.cloned();
             match animal.validate() {
-                Ok(animal_validated) => {
-                    animal_error.reset();
-                    edit_animal(id, animal_validated.into())
-                        .await
-                        .unwrap_or_else(|_| {
-                            navigator().push(Route::ErrorPage {});
-                        });
-                    navigator().push(Route::Animal {});
+                Ok(animal_validated_item) => {
+                    animal_validated.set(animal_validated_item);
+                    open.set(true);
                 }
                 Err(error) => {
                     animal_value.set((&error, &animal).into());
@@ -164,18 +166,47 @@ pub fn EditAnimal(id: i64) -> Element {
         }
     };
 
+    let submit = move |_| async move {
+        let validated_animal = animal_validated.cloned();
+        animal_error.reset();
+        edit_animal(id, validated_animal.into())
+            .await
+            .unwrap_or_else(|_| {
+                navigator().push(Route::ErrorPage {});
+            });
+        navigator().push(Route::Animal {});
+    };
+
     let animal_error_clone = animal_error_clone.unwrap_or_default();
     let animal_value_clone = animal_value.cloned();
 
     rsx! {
         Title { "Edit Animal" }
         h1 { "Edit Animal" }
-        form { class: "form", onsubmit: submit,
+        form { class: "form", onsubmit: alert,
             AnimalFormBody { animal_value: animal_value_clone, animal_input: animal_input,
                 animal_validation_error: animal_error_clone }
             button { class: "btn btn-skyblue", type: "submit", "Edit"}
         }
         Link { class: "btn btn-skyblue inline-block", to: Route::Animal { }, "Back to Animal" }
+        AlertDialogRoot {
+            open: open(),
+            on_open_change: move |v| open.set(v),
+            class: "alert-dialog-backdrop",
+            AlertDialogContent { class: "alert-dialog",
+                AlertDialogTitle { "Edit Animal" }
+                AlertDialogDescription { "Are you sure you want to edit this animal?" }
+                AlertDialogActions {
+                    class: "alert-dialog-actions",
+                    AlertDialogCancel { class: "alert-dialog-cancel", "Cancel" }
+                    AlertDialogAction {
+                        class: "alert-dialog-action",
+                        on_click: submit,
+                        "Edit Animal"
+                    }
+                }
+            }
+        }
     }
 }
 

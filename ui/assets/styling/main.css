@@ -9,6 +9,8 @@
     monospace;
     --color-red-500: oklch(63.7% 0.237 25.331);
     --color-red-600: oklch(57.7% 0.245 27.325);
+    --color-green-500: oklch(72.3% 0.219 149.579);
+    --color-green-600: oklch(62.7% 0.194 149.214);
     --color-sky-500: oklch(68.5% 0.169 237.323);
     --color-sky-600: oklch(58.8% 0.158 241.966);
     --color-gray-100: oklch(96.7% 0.003 264.542);
@@ -329,10 +331,10 @@ ul.error {
         padding-block: calc(var(--spacing) * 2);
         color: var(--color-white);
         margin-right: calc(var(--spacing) * 1);
-        background-color: var(--color-gray-500);
+        background-color: var(--color-red-500);
         &:hover {
           @media (hover: hover) {
-            background-color: var(--color-gray-600);
+            background-color: var(--color-red-600);
           }
         }
       }
@@ -342,10 +344,10 @@ ul.error {
         padding-inline: calc(var(--spacing) * 4);
         padding-block: calc(var(--spacing) * 2);
         color: var(--color-white);
-        background-color: var(--color-red-500);
+        background-color: var(--color-green-500);
         &:hover {
           @media (hover: hover) {
-            background-color: var(--color-red-600);
+            background-color: var(--color-green-600);
           }
         }
       }

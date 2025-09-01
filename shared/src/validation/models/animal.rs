@@ -19,6 +19,7 @@ impl Default for AnimalValidationError {
     }
 }
 
+#[derive(Default, Clone)]
 pub struct AnimalValidated {
     pub species: Species,
     pub description: Description,
