@@ -1,7 +1,53 @@
-use crate::validation::StrValidationExtension;
+use crate::validation::string_rules::{StringLengthRule, StringMandatoryRule};
 use crate::validation::types::ValidationCheck;
+use crate::validation::{StrValidationExtension, StringValidator};
 use std::sync::Arc;
 use thiserror::Error;
+
+pub struct SpeciesRules {
+    pub is_mandatory: bool,
+    pub min_length: Option<usize>,
+    pub max_length: Option<usize>,
+}
+
+impl Default for SpeciesRules {
+    fn default() -> Self {
+        Self {
+            is_mandatory: true,
+            min_length: None,
+            max_length: Some(20),
+        }
+    }
+}
+
+impl Into<(StringMandatoryRule, StringLengthRule)> for &SpeciesRules {
+    fn into(self) -> (StringMandatoryRule, StringLengthRule) {
+        (
+            StringMandatoryRule {
+                is_mandatory: self.is_mandatory,
+            },
+            StringLengthRule {
+                min_length: self.min_length,
+                max_length: self.max_length,
+            },
+        )
+    }
+}
+
+impl SpeciesRules {
+    fn rules(&self) -> (StringMandatoryRule, StringLengthRule) {
+        self.into()
+    }
+
+    fn check(&self, msgs: &mut Vec<String>, subject: &StringValidator) {
+        let (mandatory_rule, length_rule) = self.rules();
+        mandatory_rule.check(msgs, subject);
+        if !msgs.is_empty() {
+            return;
+        }
+        length_rule.check(msgs, subject);
+    }
+}
 
 #[derive(Debug, Error, PartialEq, Default)]
 #[error("Species Validation Error")]
@@ -27,23 +73,16 @@ impl Clone for SpeciesError {
 pub struct Species(String);
 
 impl Species {
-    pub fn parse(subject: String) -> Result<Self, SpeciesError> {
+    pub fn parse_custom(subject: String, rules: &SpeciesRules) -> Result<Self, SpeciesError> {
         let mut msgs: Vec<String> = vec![];
         let validator = subject.as_string_validator();
-
-        let mut check_count = true;
-
-        validator.is_empty().then(|| {
-            check_count = false;
-            msgs.push("Cannot be empty".to_string())
-        });
-        check_count.then(|| {
-            let count = validator.count_graphemes();
-            (count > 20).then(|| msgs.push("Must be at most 20 characters".to_string()));
-        });
-
+        rules.check(&mut msgs, &validator);
         ValidationCheck::validation_check(msgs)?;
         Ok(Species(subject))
+    }
+
+    pub fn parse(subject: String) -> Result<Self, SpeciesError> {
+        Self::parse_custom(subject, &SpeciesRules::default())
     }
 
     pub fn as_str(&self) -> &str {

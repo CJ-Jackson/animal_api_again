@@ -1,6 +1,7 @@
 use unicode_segmentation::UnicodeSegmentation;
 
 pub mod models;
+pub mod string_rules;
 pub mod types;
 
 pub struct StringValidator<'a>(&'a str, usize);
