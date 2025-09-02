@@ -116,7 +116,7 @@ pub fn Animal() -> Element {
                 AlertDialogDescription { "Are you sure you want to add this animal?" }
                 AlertDialogActions {
                     class: "alert-dialog-actions",
-                    AlertDialogCancel { class: "alert-dialog-cancel", "Cancel" }
+                    AlertDialogCancel { class: "alert-dialog-cancel mr-1", "Cancel" }
                     AlertDialogAction {
                         class: "alert-dialog-action",
                         on_click: submit,
@@ -198,7 +198,7 @@ pub fn EditAnimal(id: i64) -> Element {
                 AlertDialogDescription { "Are you sure you want to edit this animal?" }
                 AlertDialogActions {
                     class: "alert-dialog-actions",
-                    AlertDialogCancel { class: "alert-dialog-cancel", "Cancel" }
+                    AlertDialogCancel { class: "alert-dialog-cancel mr-1", "Cancel" }
                     AlertDialogAction {
                         class: "alert-dialog-action",
                         on_click: submit,
