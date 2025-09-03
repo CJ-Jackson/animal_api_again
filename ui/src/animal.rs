@@ -8,7 +8,6 @@ use shared::validation::models::animal::{AnimalValidated, AnimalValidationError}
 use shared::validation::types::description::DescriptionError;
 use shared::validation::types::species::SpeciesError;
 use shared::validation::validate_locale::ValidateErrorStore;
-use std::sync::Arc;
 
 const MAIN_CSS: Asset = asset!("/assets/styling/main.css");
 

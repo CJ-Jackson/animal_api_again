@@ -2,7 +2,6 @@ use crate::validation::string_rules::{StringLengthRule, StringMandatoryRule};
 use crate::validation::types::ValidationCheck;
 use crate::validation::validate_locale::{ValidateErrorCollector, ValidateErrorStore};
 use crate::validation::{StrValidationExtension, StringValidator};
-use std::sync::Arc;
 use thiserror::Error;
 
 pub struct DescriptionRules {
