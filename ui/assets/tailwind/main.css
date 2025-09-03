@@ -85,7 +85,7 @@ ul.error {
             @apply flex justify-end;
 
             .alert-dialog-cancel {
-                @apply btn btn-rubyred mr-1;
+                @apply btn btn-rubyred;
             }
 
             .alert-dialog-action {
