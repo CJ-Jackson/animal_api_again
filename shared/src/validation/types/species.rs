@@ -1,7 +1,7 @@
 use crate::validation::string_rules::{StringLengthRule, StringMandatoryRule};
 use crate::validation::types::ValidationCheck;
+use crate::validation::validate_locale::{ValidateErrorCollector, ValidateErrorStore};
 use crate::validation::{StrValidationExtension, StringValidator};
-use std::sync::Arc;
 use thiserror::Error;
 
 pub struct SpeciesRules {
@@ -39,7 +39,7 @@ impl SpeciesRules {
         self.into()
     }
 
-    fn check(&self, msgs: &mut Vec<String>, subject: &StringValidator) {
+    fn check(&self, msgs: &mut ValidateErrorCollector, subject: &StringValidator) {
         let (mandatory_rule, length_rule) = self.rules();
         mandatory_rule.check(msgs, subject);
         if !msgs.is_empty() {
@@ -49,12 +49,12 @@ impl SpeciesRules {
     }
 }
 
-#[derive(Debug, Error, PartialEq, Default)]
+#[derive(Debug, Error, PartialEq, Default, Clone)]
 #[error("Species Validation Error")]
-pub struct SpeciesError(pub Arc<[String]>);
+pub struct SpeciesError(pub ValidateErrorStore);
 
 impl ValidationCheck for SpeciesError {
-    fn validation_check(strings: Vec<String>) -> Result<(), Self> {
+    fn validation_check(strings: ValidateErrorCollector) -> Result<(), Self> {
         if strings.is_empty() {
             Ok(())
         } else {
@@ -63,18 +63,12 @@ impl ValidationCheck for SpeciesError {
     }
 }
 
-impl Clone for SpeciesError {
-    fn clone(&self) -> Self {
-        SpeciesError(Arc::clone(&self.0))
-    }
-}
-
 #[derive(Default, Clone, Debug, PartialEq)]
 pub struct Species(String);
 
 impl Species {
     pub fn parse_custom(subject: String, rules: SpeciesRules) -> Result<Self, SpeciesError> {
-        let mut msgs: Vec<String> = vec![];
+        let mut msgs = ValidateErrorCollector::new();
         let validator = subject.as_string_validator();
         rules.check(&mut msgs, &validator);
         ValidationCheck::validation_check(msgs)?;

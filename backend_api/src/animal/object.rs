@@ -32,12 +32,22 @@ impl From<AnimalValidationError> for AnimalErrorObject {
             species: value
                 .species
                 .err()
-                .map(|v| v.0.iter().map(|s| s.clone()).collect())
+                .map(|v| {
+                    v.0.as_original_message()
+                        .iter()
+                        .map(|s| s.clone())
+                        .collect()
+                })
                 .unwrap_or_default(),
             description: value
                 .description
                 .err()
-                .map(|v| v.0.iter().map(|s| s.clone()).collect())
+                .map(|v| {
+                    v.0.as_original_message()
+                        .iter()
+                        .map(|s| s.clone())
+                        .collect()
+                })
                 .unwrap_or_default(),
         }
     }

@@ -7,6 +7,7 @@ use dioxus_primitives::alert_dialog::*;
 use shared::validation::models::animal::{AnimalValidated, AnimalValidationError};
 use shared::validation::types::description::DescriptionError;
 use shared::validation::types::species::SpeciesError;
+use shared::validation::validate_locale::ValidateErrorStore;
 use std::sync::Arc;
 
 const MAIN_CSS: Asset = asset!("/assets/styling/main.css");
@@ -211,7 +212,8 @@ pub fn EditAnimal(id: i64) -> Element {
 }
 
 #[component]
-pub fn ErrorMessage(msgs: Arc<[String]>) -> Element {
+pub fn ErrorMessage(msgs: ValidateErrorStore) -> Element {
+    let msgs = msgs.as_original_message();
     rsx! {
         ul { class: "error",
             for msg in msgs.iter() {
