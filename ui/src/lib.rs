@@ -2,6 +2,7 @@
 
 mod animal;
 pub mod api;
+pub(crate) mod common;
 pub mod ext;
 pub mod model;
 

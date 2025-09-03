@@ -5,10 +5,11 @@ edition = "2024"
 
 [dependencies]
 dioxus = { workspace = true }
+dioxus-i18n = { workspace = true }
 reqwest = { workspace = true }
 serde = { workspace = true }
 shared = { workspace = true }
 thiserror = { workspace = true }
 error-stack = { workspace = true }
 
-dioxus-primitives = { git = "https://github.com/DioxusLabs/components" }
+dioxus-primitives = { git = "https://github.com/DioxusLabs/components", rev = "9297deb44c9bceee6f74b32cdbcbfde48e420ae6" }

@@ -20,7 +20,7 @@ pub trait LocaleForData {
 
 impl LocaleForData for LocaleData {
     fn get_translation(&self, locale: &Locale, original: String) -> String {
-        if self.args.is_empty() {
+        if !self.args.is_empty() {
             let mut values = I18NArgs::default();
             for (key, value) in self.args.iter() {
                 match value {

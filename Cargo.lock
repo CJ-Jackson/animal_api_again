@@ -1115,6 +1115,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "dioxus-i18n"
+version = "0.4.3"
+source = "git+https://github.com/dioxus-community/dioxus-i18n.git?rev=317c362e666b0a28f2fd413c68d916cc1af66782#317c362e666b0a28f2fd413c68d916cc1af66782"
+dependencies = [
+ "dioxus-lib",
+ "fluent 0.17.0",
+ "thiserror 2.0.16",
+ "unic-langid",
+ "walkdir",
+]
+
+[[package]]
 name = "dioxus-interpreter-js"
 version = "0.7.0-rc.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1135,6 +1147,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "dioxus-lib"
+version = "0.7.0-alpha.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3340a7eeebc207010d27dcf2b347c748dfd6a8605dc3624019f0c7a06e0d5d8b"
+dependencies = [
+ "dioxus-config-macro",
+ "dioxus-core",
+ "dioxus-core-macro",
+ "dioxus-hooks",
+ "dioxus-rsx",
+ "dioxus-signals",
+]
+
+[[package]]
 name = "dioxus-logger"
 version = "0.7.0-rc.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1150,7 +1176,7 @@ dependencies = [
 [[package]]
 name = "dioxus-primitives"
 version = "0.0.1"
-source = "git+https://github.com/DioxusLabs/components#562ade5eee405911e1da28a6ca70dc72b0e82550"
+source = "git+https://github.com/DioxusLabs/components?rev=9297deb44c9bceee6f74b32cdbcbfde48e420ae6#9297deb44c9bceee6f74b32cdbcbfde48e420ae6"
 dependencies = [
  "dioxus",
  "dioxus-time",
@@ -1602,7 +1628,17 @@ version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bb74634707bebd0ce645a981148e8fb8c7bccd4c33c652aeffd28bf2f96d555a"
 dependencies = [
- "fluent-bundle",
+ "fluent-bundle 0.15.3",
+ "unic-langid",
+]
+
+[[package]]
+name = "fluent"
+version = "0.17.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8137a6d5a2c50d6b0ebfcb9aaa91a28154e0a70605f112d30cb0cd4a78670477"
+dependencies = [
+ "fluent-bundle 0.16.0",
  "unic-langid",
 ]
 
@@ -1613,11 +1649,27 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7fe0a21ee80050c678013f82edf4b705fe2f26f1f9877593d13198612503f493"
 dependencies = [
  "fluent-langneg",
- "fluent-syntax",
+ "fluent-syntax 0.11.1",
  "intl-memoizer",
  "intl_pluralrules",
  "rustc-hash 1.1.0",
  "self_cell 0.10.3",
+ "smallvec",
+ "unic-langid",
+]
+
+[[package]]
+name = "fluent-bundle"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "01203cb8918f5711e73891b347816d932046f95f54207710bda99beaeb423bf4"
+dependencies = [
+ "fluent-langneg",
+ "fluent-syntax 0.12.0",
+ "intl-memoizer",
+ "intl_pluralrules",
+ "rustc-hash 2.1.1",
+ "self_cell 1.2.0",
  "smallvec",
  "unic-langid",
 ]
@@ -1638,6 +1690,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2a530c4694a6a8d528794ee9bbd8ba0122e779629ac908d15ad5a7ae7763a33d"
 dependencies = [
  "thiserror 1.0.69",
+]
+
+[[package]]
+name = "fluent-syntax"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "54f0d287c53ffd184d04d8677f590f4ac5379785529e5e08b1c8083acdd5c198"
+dependencies = [
+ "memchr",
+ "thiserror 2.0.16",
 ]
 
 [[package]]
@@ -3617,9 +3679,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9f977080932c87287147dca052951c3e2696f8759863f6b4e4c0c9ffe7a4cc8b"
 dependencies = [
  "bytes",
- "fluent",
+ "fluent 0.16.1",
  "fluent-langneg",
- "fluent-syntax",
+ "fluent-syntax 0.11.1",
  "futures-util",
  "headers",
  "http",
@@ -5351,6 +5413,7 @@ name = "ui"
 version = "0.1.0"
 dependencies = [
  "dioxus",
+ "dioxus-i18n",
  "dioxus-primitives",
  "error-stack",
  "reqwest",

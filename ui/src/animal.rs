@@ -1,8 +1,10 @@
 use crate::api::animal::{add_animal, edit_animal, fetch_all_animals, fetch_animal_by_id};
+use crate::common::locale::{LocaleForStore, build_locale_config};
 use crate::ext::ResetSignal;
 use crate::model::animal::{AnimalModel, AnimalModelSignal};
 use dioxus::document::Title;
 use dioxus::prelude::*;
+use dioxus_i18n::prelude::*;
 use dioxus_primitives::alert_dialog::*;
 use shared::validation::models::animal::{AnimalValidated, AnimalValidationError};
 use shared::validation::types::description::DescriptionError;
@@ -24,6 +26,8 @@ enum Route {
 
 #[component]
 pub fn UiApp() -> Element {
+    use_init_i18n(|| build_locale_config());
+
     rsx! {
         document::Link { rel: "stylesheet", href: MAIN_CSS }
         div { class: "container content",
@@ -212,7 +216,8 @@ pub fn EditAnimal(id: i64) -> Element {
 
 #[component]
 pub fn ErrorMessage(msgs: ValidateErrorStore) -> Element {
-    let msgs = msgs.as_original_message();
+    let i18n = i18n();
+    let msgs = msgs.as_translated_message(&i18n);
     rsx! {
         ul { class: "error",
             for msg in msgs.iter() {
