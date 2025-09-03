@@ -1,5 +1,6 @@
 use crate::animal::AnimalApi;
 use crate::common::config::Config;
+use crate::common::locale::build_resources;
 use crate::common::object::Message;
 use error_stack::{Report, ResultExt};
 use poem::listener::TcpListener;
@@ -39,6 +40,8 @@ pub enum MainError {
     ConfigError,
     #[error("IO error")]
     IoError,
+    #[error("Locale error")]
+    LocaleError,
 }
 
 #[tokio::main]
@@ -49,7 +52,10 @@ async fn main() -> Result<(), Report<MainError>> {
 
     let api_service = OpenApiService::new((HomeApi, AnimalApi), "Animal API", "1.0.0");
     let ui = api_service.swagger_ui();
-    let app = Route::new().nest("/", api_service).nest("/docs", ui);
+    let app = Route::new()
+        .nest("/", api_service)
+        .nest("/docs", ui)
+        .data(build_resources().change_context(MainError::LocaleError)?);
 
     let cors = Cors::new();
     let app = app.with(cors);

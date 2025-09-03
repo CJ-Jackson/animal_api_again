@@ -1,3 +1,5 @@
+use crate::common::locale::LocaleForStore;
+use poem::i18n::Locale;
 use poem_openapi::Object;
 use shared::validation::models::animal::{AnimalValidated, AnimalValidationError};
 
@@ -44,6 +46,33 @@ impl From<AnimalValidationError> for AnimalErrorObject {
                 .err()
                 .map(|v| {
                     v.0.as_original_message()
+                        .iter()
+                        .map(|s| s.clone())
+                        .collect()
+                })
+                .unwrap_or_default(),
+        }
+    }
+}
+
+impl From<(AnimalValidationError, &Locale)> for AnimalErrorObject {
+    fn from((animal, locale): (AnimalValidationError, &Locale)) -> Self {
+        Self {
+            species: animal
+                .species
+                .err()
+                .map(|v| {
+                    v.0.as_translated_message(locale)
+                        .iter()
+                        .map(|s| s.clone())
+                        .collect()
+                })
+                .unwrap_or_default(),
+            description: animal
+                .description
+                .err()
+                .map(|v| {
+                    v.0.as_translated_message(locale)
                         .iter()
                         .map(|s| s.clone())
                         .collect()

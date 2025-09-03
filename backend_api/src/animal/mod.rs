@@ -10,6 +10,7 @@ use crate::animal::response::{
 };
 use crate::common::context::Dep;
 use crate::common::results::unified;
+use poem::i18n::Locale;
 use poem_openapi::OpenApi;
 use poem_openapi::param::Path;
 use poem_openapi::payload::Json;
@@ -55,10 +56,11 @@ impl AnimalApi {
         &self,
         Json(animal): Json<AnimalAddUpdateObject>,
         Dep(animal_repository): Dep<AnimalRepository>,
+        locale: Locale,
     ) -> AddAnimalResponse {
         unified(async {
             animal.to_validate().map_err(|animal_err| {
-                AddAnimalResponse::UnprocessableEntity(Json(animal_err.into()))
+                AddAnimalResponse::UnprocessableEntity(Json((animal_err, &locale).into()))
             })?;
             animal_repository
                 .add_animal(&animal)
@@ -75,10 +77,11 @@ impl AnimalApi {
         Path(id): Path<u64>,
         Json(animal): Json<AnimalAddUpdateObject>,
         Dep(animal_repository): Dep<AnimalRepository>,
+        locale: Locale,
     ) -> UpdateAnimalResponse {
         unified(async {
             animal.to_validate().map_err(|animal_error| {
-                UpdateAnimalResponse::UnprocessableEntity(Json(animal_error.into()))
+                UpdateAnimalResponse::UnprocessableEntity(Json((animal_error, &locale).into()))
             })?;
             animal_repository
                 .update_animal(&animal, id as i64)

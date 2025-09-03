@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::fmt::Debug;
 use std::sync::Arc;
 
+#[derive(Clone)]
 pub enum LocaleValue {
     String(String),
     Uint(usize),

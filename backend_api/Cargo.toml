@@ -12,7 +12,7 @@ thiserror = { workspace = true }
 error-stack = { workspace = true }
 shared = { workspace = true }
 
-poem = { version = "3.1.12" }
+poem = { version = "3.1.12", features = ["i18n"] }
 poem-openapi = { version = "5.1.16", features = ["swagger-ui"] }
 figment = { version = "0.10.19", features = ["toml"] }
 rusqlite = { version = "0.37.0", features = ["chrono"] }
