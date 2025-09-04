@@ -1,6 +1,6 @@
 use crate::validation::models::error_flag;
-use crate::validation::types::description::{Description, DescriptionError};
 use crate::validation::types::species::{Species, SpeciesError};
+use cjtoolkit_structured_validator::types::description::{Description, DescriptionError};
 use thiserror::Error;
 
 #[derive(Debug, Error, Clone, PartialEq)]
@@ -31,7 +31,10 @@ impl AnimalValidated {
 
         use error_flag as ef;
         let species = ef(&mut flag, Species::parse(species.clone()));
-        let description = ef(&mut flag, Description::parse(description.clone()));
+        let description = ef(
+            &mut flag,
+            Description::parse(Some(description.clone().as_str())),
+        );
 
         if flag {
             return Err(AnimalValidationError {

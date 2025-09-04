@@ -2,14 +2,14 @@ use crate::api::animal::{add_animal, edit_animal, fetch_all_animals, fetch_anima
 use crate::common::locale::{LocaleForStore, build_locale_config};
 use crate::ext::ResetSignal;
 use crate::model::animal::{AnimalModel, AnimalModelSignal};
+use cjtoolkit_structured_validator::common::locale::ValidateErrorStore;
+use cjtoolkit_structured_validator::types::description::DescriptionError;
 use dioxus::document::Title;
 use dioxus::prelude::*;
 use dioxus_i18n::prelude::*;
 use dioxus_primitives::alert_dialog::*;
 use shared::validation::models::animal::{AnimalValidated, AnimalValidationError};
-use shared::validation::types::description::DescriptionError;
 use shared::validation::types::species::SpeciesError;
-use shared::validation::validate_locale::ValidateErrorStore;
 
 const MAIN_CSS: Asset = asset!("/assets/styling/main.css");
 

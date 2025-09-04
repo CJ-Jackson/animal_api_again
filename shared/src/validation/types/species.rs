@@ -1,7 +1,9 @@
-use crate::validation::string_rules::{StringLengthRule, StringMandatoryRule};
-use crate::validation::types::ValidationCheck;
-use crate::validation::validate_locale::{ValidateErrorCollector, ValidateErrorStore};
-use crate::validation::{StrValidationExtension, StringValidator};
+use cjtoolkit_structured_validator::base::string_rules::{StringLengthRules, StringMandatoryRules};
+use cjtoolkit_structured_validator::common::locale::{ValidateErrorCollector, ValidateErrorStore};
+use cjtoolkit_structured_validator::common::string_validator::{
+    StrValidationExtension, StringValidator,
+};
+use cjtoolkit_structured_validator::common::validation_check::ValidationCheck;
 use thiserror::Error;
 
 pub struct SpeciesRules {
@@ -20,13 +22,13 @@ impl Default for SpeciesRules {
     }
 }
 
-impl Into<(StringMandatoryRule, StringLengthRule)> for &SpeciesRules {
-    fn into(self) -> (StringMandatoryRule, StringLengthRule) {
+impl Into<(StringMandatoryRules, StringLengthRules)> for &SpeciesRules {
+    fn into(self) -> (StringMandatoryRules, StringLengthRules) {
         (
-            StringMandatoryRule {
+            StringMandatoryRules {
                 is_mandatory: self.is_mandatory,
             },
-            StringLengthRule {
+            StringLengthRules {
                 min_length: self.min_length,
                 max_length: self.max_length,
             },
@@ -35,7 +37,7 @@ impl Into<(StringMandatoryRule, StringLengthRule)> for &SpeciesRules {
 }
 
 impl SpeciesRules {
-    fn rules(&self) -> (StringMandatoryRule, StringLengthRule) {
+    fn rules(&self) -> (StringMandatoryRules, StringLengthRules) {
         self.into()
     }
 
@@ -54,12 +56,8 @@ impl SpeciesRules {
 pub struct SpeciesError(pub ValidateErrorStore);
 
 impl ValidationCheck for SpeciesError {
-    fn validation_check(strings: ValidateErrorCollector) -> Result<(), Self> {
-        if strings.is_empty() {
-            Ok(())
-        } else {
-            Err(SpeciesError(strings.into()))
-        }
+    fn validate_new(messages: ValidateErrorStore) -> Self {
+        Self(messages)
     }
 }
 
@@ -71,7 +69,7 @@ impl Species {
         let mut msgs = ValidateErrorCollector::new();
         let validator = subject.as_string_validator();
         rules.check(&mut msgs, &validator);
-        ValidationCheck::validation_check(msgs)?;
+        ValidationCheck::validate_check(msgs)?;
         Ok(Species(subject))
     }
 

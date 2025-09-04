@@ -1,7 +1,7 @@
+use cjtoolkit_structured_validator::common::locale::{LocaleData, LocaleValue, ValidateErrorStore};
 use dioxus_i18n::fluent::FluentArgs;
 use dioxus_i18n::prelude::{I18n, I18nConfig};
 use dioxus_i18n::unic_langid::langid;
-use shared::validation::validate_locale::{LocaleData, LocaleValue, ValidateErrorStore};
 use std::sync::Arc;
 
 pub fn build_locale_config() -> I18nConfig {

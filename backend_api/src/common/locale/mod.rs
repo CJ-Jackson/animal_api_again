@@ -1,6 +1,6 @@
+use cjtoolkit_structured_validator::common::locale::{LocaleData, LocaleValue, ValidateErrorStore};
 use poem::error::I18NError;
 use poem::i18n::{I18NArgs, I18NResources, Locale};
-use shared::validation::validate_locale::{LocaleData, LocaleValue, ValidateErrorStore};
 use std::sync::Arc;
 
 pub fn build_resources() -> Result<I18NResources, I18NError> {

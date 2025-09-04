@@ -48,6 +48,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b0674a1ddeecb70197781e945de4b3b8ffb61fa939a5597bcf48503737663100"
 
 [[package]]
+name = "arrayref"
+version = "0.3.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "76a2e8124351fda1ef8aaaa3bbd7ebbcb486bbcd4225aca0aa0d84bb2db8fecb"
+
+[[package]]
+name = "arrayvec"
+version = "0.7.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7c02d123df017efcdfbd739ef81735b36c5ba83ec3c59c80a9d7ecc718f92e50"
+
+[[package]]
 name = "ashpd"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -151,6 +163,7 @@ name = "backend_api"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "cjtoolkit-structured-validator",
  "error-stack",
  "figment",
  "poem",
@@ -161,7 +174,6 @@ dependencies = [
  "shared",
  "thiserror 2.0.16",
  "tokio",
- "unicode-segmentation",
 ]
 
 [[package]]
@@ -204,6 +216,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "34efbcccd345379ca2868b2b2c9d3782e9cc58ba87bc7d79d5b53d9c9ae6f25d"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "blake3"
+version = "1.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3888aaa89e4b2a40fca9848e400f6a658a5a3978de7be858e209cafa8be9a4a0"
+dependencies = [
+ "arrayref",
+ "arrayvec",
+ "cc",
+ "cfg-if",
+ "constant_time_eq",
 ]
 
 [[package]]
@@ -370,6 +395,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "cjtoolkit-structured-validator"
+version = "0.1.0"
+source = "git+https://github.com/cjtoolkit/cjtoolkit-structured-validator.git?rev=0725689b92fcebf0451d6505e460b894da9eea77#0725689b92fcebf0451d6505e460b894da9eea77"
+dependencies = [
+ "blake3",
+ "thiserror 2.0.16",
+ "unicode-segmentation",
+]
+
+[[package]]
 name = "cocoa"
 version = "0.26.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -473,6 +508,12 @@ dependencies = [
  "quote",
  "unicode-xid",
 ]
+
+[[package]]
+name = "constant_time_eq"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7c74b8349d32d297c9134b8c88677813a227df8f779daa29bfc29c183fe3dca6"
 
 [[package]]
 name = "convert_case"
@@ -4616,8 +4657,8 @@ dependencies = [
 name = "shared"
 version = "0.1.0"
 dependencies = [
+ "cjtoolkit-structured-validator",
  "thiserror 2.0.16",
- "unicode-segmentation",
 ]
 
 [[package]]
@@ -5412,6 +5453,7 @@ dependencies = [
 name = "ui"
 version = "0.1.0"
 dependencies = [
+ "cjtoolkit-structured-validator",
  "dioxus",
  "dioxus-i18n",
  "dioxus-primitives",

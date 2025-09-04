@@ -11,5 +11,6 @@ serde = { workspace = true }
 shared = { workspace = true }
 thiserror = { workspace = true }
 error-stack = { workspace = true }
+cjtoolkit-structured-validator = { workspace = true }
 
 dioxus-primitives = { git = "https://github.com/DioxusLabs/components", rev = "9297deb44c9bceee6f74b32cdbcbfde48e420ae6" }
